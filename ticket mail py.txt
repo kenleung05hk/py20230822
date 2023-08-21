@@ -1,0 +1,54 @@
+import win32com.client as win32
+from datetime import datetime, timedelta,timezone
+from pathlib import Path
+
+
+timedata=datetime.now() - timedelta(1)
+YYYY=timedata.strftime("%Y")
+MMMM=timedata.strftime("%m")
+DDDD=timedata.strftime("%d")
+YYYYMMMM=YYYY+'-'+MMMM
+numbertime=timedata.strftime('%Y%m%d')
+
+
+outlook = win32.Dispatch('outlook.application')
+mail = outlook.CreateItem(0)
+mail.Subject = 'Daily Trading Report and Tickets ' + timedata.strftime('%Y%m%d')
+mail.To = "settlement@htfc.com.hk"
+mail.CC = "dealing@htfc.com.hk"
+
+body_text = r"""
+Dear settlement,<br><br>
+0 Force Close and 0 LME carry trades today.<br><br>
+"""
+
+mail.Display(False)
+mail.HTMLBody = body_text + mail.HTMLBody
+
+ticket_path=Path(
+    "//10.109.255.11/交易风控部/Dealing Room/Dealing Room/Daily Report/(D) Daily Trading Report & Ticket/Daily Trading Report & Ticket "+YYYY+"/Daily Trading Report & Ticket "+YYYYMMMM+"/Daily Trading Report & Ticket "+numbertime+".pdf")
+force_path=Path(
+    "//10.109.255.11/交易风控部/Dealing Room/Dealing Room/Daily Report/(D) Client Margin Call Report/强平报告 "+YYYY+"/强平报告 "+YYYYMMMM+"/强平报告"+numbertime+".pdf")
+
+print("強平"+str(force_path.exists()))
+ticket_path_str=str(ticket_path)
+force_path_str=str(force_path)
+
+
+if  force_path.exists():
+    mail.Attachments.Add(ticket_path_str)
+    mail.Attachments.Add(force_path_str)
+else:
+    mail.Attachments.Add(ticket_path_str)
+
+YYYY=datetime.now().strftime("%Y")
+MMMM=datetime.now().strftime("%m")
+DDDD=datetime.now().strftime("%d")
+YYYY=int(YYYY)    #delay dev
+MMMM=int(MMMM)
+DDDD=int(DDDD)  #remind now-1
+mail.DeferredDeliveryTime = datetime(YYYY, MMMM, DDDD,6,10,0,tzinfo=timezone.utc)#winter
+print("winter delay")
+
+
+

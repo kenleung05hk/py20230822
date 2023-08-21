@@ -1,0 +1,39 @@
+import random
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+def monte_carlo_simulation(series_a, weight_b):
+    # Create empty lists for samples and results
+    samples = []
+    results = []
+
+    # Draw 280 samples from series_a based on weight_b
+    for i in range(280):
+        sample = random.choices(series_a, weights=weight_b)
+        samples.append(sample[0])
+
+    # Multiply each sample by the previous sample and store the result
+    result = 1
+    for sample in samples:
+        result *= sample
+        results.append(result)
+
+    # Return the list of results
+    return results
+
+
+def export_to_excel(series_a, weight_b):
+    # Perform Monte Carlo simulation 1000 times and plot the results
+    results = []
+    for i in range(1000):
+        result = monte_carlo_simulation(series_a, weight_b)
+        results.append(result)
+        plt.plot(result)
+
+    # Export results to Excel
+    df = pd.DataFrame(results)
+    df.to_excel('monte_carlo_results.xlsx', index=False)
+
+export_to_excel(series_a, weight_b)
+plt.show()

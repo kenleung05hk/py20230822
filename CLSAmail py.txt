@@ -1,0 +1,50 @@
+import win32com.client as win32
+from datetime import datetime, timedelta ,timezone
+from pathlib import Path
+from pandas.tseries.offsets import BDay
+import glob
+import os
+import shutil
+
+timedata=datetime.now()
+YYYY=timedata.strftime("%Y")
+MMMM=timedata.strftime("%m")
+DDDD=timedata.strftime("%d")
+YYYYMMMM=YYYY+'-'+MMMM
+numbertime=timedata.strftime('%Y%m%d')
+
+
+body_text = r"""
+ <font size="3">Dear all,</font>
+<br><br>
+The attached file is today IM.
+<br><br><br>
+"""
+pdf_file=Path(
+"Z:\\Dealing Room\\Dealing Room\\Daily Report\\(D) Client Margin Call Report\\Client Margin Cap Screen_收市截图\\Client Margin Cap Screen "+numbertime+".pdf")
+
+
+outlook = win32.Dispatch('outlook.application')
+mail = outlook.CreateItem(0)
+mail.Subject = 'CLSA Margin Level'+""
+mail.To = "am-ops@clsa.com"+";"+"am-inv@clsa.com"
+mail.CC = "dealing@htfc.com.hk"
+mail.Display(False)
+mail.HTMLBody = body_text + mail.HTMLBody
+
+YYYY=int(YYYY)
+MMMM=int(MMMM)
+DDDD=int(DDDD)
+mail.DeferredDeliveryTime = datetime(YYYY, MMMM, DDDD,18,30,0,tzinfo=timezone.utc)
+
+YYMMDD_file = Path(r"Z:\Dealing Room\ken leung\py data\CLSA Margin Level\CLSA Margin Level YYYYMMDD.xlsx")
+to_file=Path("Z:\\Dealing Room\\ken leung\py data\\CLSA Margin Level\\CLSA Margin Level "+numbertime+".xlsx")
+shutil.copy(str(YYMMDD_file), str(to_file))
+
+mail.Attachments.Add(str(to_file))
+os.startfile(str(to_file))
+
+print(mail.DeferredDeliveryTime)
+
+
+

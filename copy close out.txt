@@ -1,0 +1,34 @@
+import datetime
+import shutil
+list_date=[]
+start_date = datetime.date(2023, 7, 20)
+end_date = datetime.date(2023, 7, 31)
+
+for i in range((end_date - start_date).days + 1):
+    date = start_date + datetime.timedelta(days=i)
+    if date.weekday() < 5:
+        list_date.append(date.strftime("%Y%m%d"))
+        #print(date.strftime("%Y%m%d"))
+print(list_date)
+
+
+
+src = 'C:/Users/Dealing/Desktop/ken_local/night/123.xlsx'
+for i in list_date:
+    dst = f'C:/Users/Dealing/Desktop/ken_local/night/CSOP_report_{i}.xlsx'
+    shutil.copy(src, dst)
+
+'''import datetime
+
+start_date = datetime.date(2023, 7, 1)
+end_date = datetime.date(2023, 8, 31)
+delta = datetime.timedelta(days=1)
+
+result = []
+
+for i in range((end_date - start_date).days + 1):
+    day = start_date + delta * i
+    if day.weekday() < 5:
+        result.append(day.strftime('%Y%m%d'))
+
+print(result)'''

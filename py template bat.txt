@@ -1,0 +1,3 @@
+@echo off
+"C:\Users\user\PycharmProjects\pythonProject\venv\Scripts\python.exe" "py path"
+::pause

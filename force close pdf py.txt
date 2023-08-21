@@ -1,0 +1,45 @@
+# 先scan ticket
+from win32com import client
+from pathlib import Path
+from datetime import datetime, timedelta
+import glob
+import os
+import shutil
+
+timedata=datetime.now() - timedelta(1)
+YYYY,MMMM,DDDD = [timedata.strftime("%Y"),timedata.strftime("%m"),timedata.strftime("%d")]
+YYYYMMMM=YYYY+'-'+MMMM
+numbertime=timedata.strftime('%Y%m%d')
+
+
+excel_path=Path(
+    r'\\10.109.255.11\交易风控部\Dealing Room\Dealing Room\Daily Report\(D) Client Margin Call Report\HTHK-RISK-C003强平报告 (Template).xlsx')
+excel_path=str(excel_path)
+
+pdf_path=Path(r"\\10.109.255.11\交易风控部\Dealing Room\Dealing Room\Daily Report\(D) Client Margin Call Report"
+    "\强平报告 {}\强平报告 {}\强平报告{}.pdf".format(YYYY,YYYYMMMM,numbertime)
+              )
+pdf_path=str(pdf_path)
+print(YYYYMMMM,"path exists:",Path(r"\\10.109.255.11\交易风控部\Dealing Room\Dealing Room\Daily Report\(D) Client Margin Call Report"
+    "\强平报告 {}\强平报告 {}".format(YYYY,YYYYMMMM)).exists())
+# Open Microsoft Excel
+excel = client.Dispatch("Excel.Application")
+Worksheet_number=int(input("Worksheet_number? 0/1"))
+# Read Excel File
+sheets = excel.Workbooks.Open(excel_path)
+work_sheets = sheets.Worksheets[Worksheet_number]
+# Convert into PDF File
+work_sheets.ExportAsFixedFormat(0, pdf_path)   # PATH問題    File "<COMObject <unknown>>", line 5, in ExportAsFixedFormat
+##########################################
+list_of_files = glob.glob('//10.109.255.11/home/Scan/*.pdf') # * means all if need specific format then *.csv
+latest_file = max(list_of_files, key=os.path.getctime)
+print(latest_file)
+to_file=Path(r"\\10.109.255.11\交易风控部\Dealing Room\Dealing Room\Daily Report\(D) Daily Trading Report & Ticket\Daily Trading Report & Ticket"
+             r" {}\Daily Trading Report & Ticket {}\Daily Trading Report & Ticket {}.pdf".format(YYYY,YYYYMMMM,numbertime)
+             )
+shutil.copy(str(latest_file), str(to_file))
+print(
+    to_file)
+excel.Application.Quit()
+latest_file=str(latest_file)
+print("scan file date:",latest_file[30:34] ,latest_file[34:38])

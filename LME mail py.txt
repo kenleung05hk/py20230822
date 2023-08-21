@@ -1,0 +1,43 @@
+from pathlib import Path
+import pyexcel
+import os
+import win32com.client as win32
+from datetime import datetime, timedelta ,timezone
+
+timedata=datetime.now()
+YYYY=timedata.strftime("%Y")
+MMMM=timedata.strftime("%m")
+DDDD=timedata.strftime("%d")
+YYYYMMMM=YYYY+'-'+MMMM
+numbertime=timedata.strftime('%Y%m%d')
+
+excel_path="Z:\\Dealing Room\\ken leung\\py data\\LME closing price\\LME closing price.xlsx"
+book = pyexcel.get_book(file_name=excel_path)
+book=book.reference
+book.save_as("Z:\\Dealing Room\\ken leung\\py data\\LME closing price\\LME closing price "+numbertime+".xlsx")
+
+body_text = r"""
+ <font size="3">你好,</font>
+<br><br>
+附件是今天LME各產品日期的收市价。
+<br><br><br>
+"""
+
+outlook = win32.Dispatch('outlook.application')
+mail = outlook.CreateItem(0)
+mail.Subject = 'LME Closing Price'+""
+mail.To = "956137146@qq.com"
+mail.CC = "dealing@htfc.com.hk"
+mail.Display(False)
+mail.HTMLBody = body_text + mail.HTMLBody
+
+YYYY=int(YYYY)
+MMMM=int(MMMM)
+DDDD=int(DDDD)
+mail.DeferredDeliveryTime = datetime(YYYY, MMMM, DDDD,5,00,0,tzinfo=timezone.utc)
+
+to_file=Path("Z:\\Dealing Room\\ken leung\\py data\\LME closing price\\LME closing price "+numbertime+".xlsx")
+mail.Attachments.Add(str(to_file))
+#os.startfile(str(to_file))                    #open excel
+
+print('Modified on:',datetime.fromtimestamp(os.path.getmtime(excel_path)))

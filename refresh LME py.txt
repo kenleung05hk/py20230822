@@ -1,0 +1,29 @@
+from pathlib import Path
+import pyexcel as pe
+import shutil
+import time
+import win32com.client as win32
+from datetime import datetime, timedelta
+
+timedata=datetime.now()
+YYYY=timedata.strftime("%Y")
+MMMM=timedata.strftime("%m")
+DDDD=timedata.strftime("%d")
+numbertime=timedata.strftime('%Y%m%d')
+excel_path=Path("Z:\Dealing Room\ken leung\py data\LME closing price\LME closing price.xlsx")
+excel_path=str(excel_path)
+
+print(excel_path)
+
+xl = win32.Dispatch('Excel.Application')
+xl.Visible = 1
+xl.DisplayAlerts = False
+wb = xl.Workbooks.Open(excel_path)
+time.sleep(1)
+wb.Worksheets(1).Activate()
+time.sleep(1)
+wb.Worksheets(2).Activate()
+time.sleep(1)
+wb.SaveAs("Z:\\Dealing Room\\ken leung\\py data\\LME closing price\\LME closing price "+numbertime+".xlsx")
+time.sleep(1)
+wb.Close(True)

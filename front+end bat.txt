@@ -1,0 +1,22 @@
+@if (@CodeSection == @Batch) @then
+@echo off
+timeout /t 1
+SET SendKeys=CScript //nologo //E:JScript "%~F0"
+
+start "windowTitle1" "C:\Users\Dealing\AppData\Roaming\EPolestar200804\epolestar ix.exe""
+timeout /t 3
+start "windowTitle2" "C:\Users\Dealing\Desktop\iTapManager_9.2.8.16 20230619\iTapManage.exe"
+timeout /t 10
+%SendKeys% {TAB}
+timeout /t 1
+%SendKeys% "kenleung"
+timeout /t 1
+%SendKeys% {TAB}
+timeout /t 1
+%SendKeys% "+ken123456"
+timeout /t 1
+%SendKeys% {ENTER}
+
+@end
+var WshShell = WScript.CreateObject("WScript.Shell");
+WshShell.SendKeys(WScript.Arguments(0));

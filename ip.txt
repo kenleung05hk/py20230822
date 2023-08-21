@@ -1,0 +1,35 @@
+import pandas as pd
+from pathlib import Path
+
+df_esunny_path=Path(
+    "C:/Users/Dealing/Desktop/ken_local/jul.csv"
+)
+
+try:
+    esunny=pd.read_csv(df_esunny_path)
+except FileNotFoundError:
+    print('The file does not exist.')
+    input("Please check the data is vaild ,press any key to exit")
+
+esunny_mem_vol=esunny[["登录账号", "登录IP","登录地区"]]
+
+all_mem_vol=esunny_mem_vol.drop_duplicates(
+  subset = ['登录IP', '登录账号'],
+  keep = 'last').reset_index(drop = True)
+
+dropbyacregion=esunny_mem_vol.drop_duplicates(
+  subset = ['登录账号', '登录地区'],
+  keep = 'last').reset_index(drop = True)
+
+ac = all_mem_vol.groupby("登录账号")["登录账号"].count()
+ip = all_mem_vol.groupby("登录IP")["登录IP"].count()
+"""
+for key, item in ac:
+    print(ac.get_group(key), "\n\n")
+"""
+all_mem_vol.to_csv("C:/Users/Dealing/Desktop/ken_local/acip.csv",encoding="utf_8_sig")
+dropbyacregion.to_csv("C:/Users/Dealing/Desktop/ken_local/acregion.csv",encoding="utf_8_sig")
+ac.to_csv("C:/Users/Dealing/Desktop/ken_local/acc.csv",encoding="utf_8_sig")
+ip.to_csv("C:/Users/Dealing/Desktop/ken_local/ip.csv",encoding="utf_8_sig")
+print(ac)
+print(ip)

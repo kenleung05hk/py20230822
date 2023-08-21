@@ -1,0 +1,58 @@
+import win32com.client as win32
+from datetime import datetime, timedelta ,timezone
+from pathlib import Path
+from docx import Document
+from docx.shared import Inches
+from docx2pdf import convert
+from pandas.tseries.offsets import BDay
+import glob
+import os
+import shutil
+
+timedata=datetime.now()
+YYYY=timedata.strftime("%Y")
+MMMM=timedata.strftime("%m")
+DDDD=timedata.strftime("%d")
+YYYYMMMM=YYYY+'-'+MMMM
+numbertime=timedata.strftime('%Y%m%d')
+
+
+body_text = r"""
+ <font size="3">各位领导，</font>
+<br><br>
+您好！附件為我司客戶风险截图(每交易日16:30發出)。 
+<br><br><br>
+"""
+
+
+outlook = win32.Dispatch('outlook.application')
+mail = outlook.CreateItem(0)
+mail.Subject = 'Client Margin Cap Screen ' + numbertime
+mail.To = "wengyi@htfc.com"+";"+"lsz@htfc.com"
+mail.CC = "dealing@htfc.com.hk"
+mail.Display(False)
+mail.HTMLBody = body_text + mail.HTMLBody
+
+YYYY=int(YYYY)
+MMMM=int(MMMM)
+DDDD=int(DDDD)
+mail.DeferredDeliveryTime = datetime(YYYY, MMMM, DDDD,16,45,0,tzinfo=timezone.utc)
+
+
+document = Document()
+p = document.add_paragraph('Esunny')
+document.add_picture('Z:\\Dealing Room\\ken leung\\py data\\risk capscreen daily record\\esunny'+numbertime+'.jpg', width=Inches(6.1))
+p = document.add_paragraph('ATP')
+document.add_picture('Z:\\Dealing Room\\ken leung\\py data\\risk capscreen daily record\\atp'+numbertime+'.jpg', width=Inches(6.1))
+cap_screen=document.save('Z:\\Dealing Room\\ken leung\\py data\\risk capscreen daily record\\Client Margin Cap Screen '+numbertime+'.docx')
+convert('Z:\\Dealing Room\\ken leung\\py data\\risk capscreen daily record\\Client Margin Cap Screen '+numbertime+'.docx',
+        'Z:\\Dealing Room\\ken leung\\py data\\risk capscreen daily record\\Client Margin Cap Screen '+numbertime+'.pdf')
+
+
+mail.Attachments.Add('Z:\\Dealing Room\\ken leung\\py data\\risk capscreen daily record\\Client Margin Cap Screen '+numbertime+'.pdf')
+os.startfile('Z:\\Dealing Room\\ken leung\\py data\\risk capscreen daily record\\Client Margin Cap Screen '+numbertime+'.pdf')
+
+print(mail.DeferredDeliveryTime)
+
+
+

@@ -1,0 +1,43 @@
+import streamlit as st
+import pandas as pd
+import def_mail
+import pythoncom
+
+uploaded_file = st.file_uploader("SwapStatisticsReport")
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file,header=8)
+    #df = df.drop(df.columns[[1,2,5,6,7,11,12,16,18,19,21]], axis=1)
+    #df=df.iloc[:,[3,4,8,9,13]]改位置前
+    #df = df.iloc[:, [3 ,4 ,7 ,9 ,12]]改位置後
+    df = df.loc[:, ["AccountNo", "AccountName", 'CCY Group', 'CCY', 'Available1']]#select columns by name
+    df = df.dropna(axis=1, how="all")
+    df = df[df["Available1"].astype(str).str.startswith('-', na=False)]
+    st.write(df)
+
+uploaded_file2 = st.file_uploader("Email list:")
+if uploaded_file2 is not None:
+    df1 = pd.read_excel(uploaded_file2)
+    s1 = df1.columns[df1.isin(['P000078A']).any()]
+    s2 = df1.columns[df1.isin(['13928792888@139.com']).any()]
+    df1 =pd.concat([df1[s1],df1[s2]],axis=1)
+    df1=df1.set_axis(['AccountNo', 'Mail'], axis='columns')
+    df3 = pd.merge(df,df1,on="AccountNo", how='left')
+    df3= df3.dropna(how='any')
+    st.write(df3)
+
+"""UAT
+"""
+
+
+for index, row in df3.iterrows():
+    idx=st.button(row["AccountNo"]+' '+row["CCY Group"]+'_'+row["CCY"]+' 換匯')
+    if idx == True:
+        pythoncom.CoInitialize()
+        def_mail.send_outlook_mail(to=str(row["Mail"].replace(',',';')),
+                                   client_name=row["AccountName"]+" ("+row["AccountNo"]+")",
+                                   #currency=row["CCY Group"] + "_" + row["CCY"] + " " + abs(round(int(row["Available1"]),2)))
+                                   currency=row["CCY Group"]+"_"+row["CCY"]+" "+"%.2f" %abs(row["Available1"]))
+
+        pythoncom.CoUninitialize()
+
+        

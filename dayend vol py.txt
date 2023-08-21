@@ -1,0 +1,37 @@
+import pandas as pd
+from pathlib import Path
+from datetime import datetime, timedelta
+
+timedata=datetime.now() - timedelta(1)
+YYYY,MMMM,DDDD = [timedata.strftime("%Y"),timedata.strftime("%m"),timedata.strftime("%d")]
+YYYYMMMM=YYYY+'-'+MMMM
+numbertime=timedata.strftime('%Y%m%d')
+
+df_esunny_path=Path(
+    "//10.109.255.11/交易风控部/Dealing Room/Dealing Room/Daily Report/(D) Esunny Daily Trading Report/Daily Trading "
+    "Report {}/Daily Trading Report {}/成交查询/Esunny Filled order report {}.csv".format(YYYY,YYYYMMMM,numbertime)
+)
+df_atp_path: Path=Path(
+    "//10.109.255.11/交易风控部/Dealing Room/Dealing Room/Daily Report/(D) ATP Daily Trading Report/所有成交 (FCM EXPORT"
+    ")/{}/{}/ATP FCM {}.csv".format(YYYY, YYYYMMMM, numbertime)
+)
+esunny=pd.read_csv(df_esunny_path)
+atp=pd.read_csv(df_atp_path)
+
+esunny_mem_vol=esunny[["会员号                   ", "成交量                   "]]
+esunny_mem_vol=esunny_mem_vol.rename(columns={"会员号                   ":"Broker Short Name",'成交量                   ':"Quantity"})
+atp_mem_vol=atp[["Broker Short Name","Quantity"]]
+
+esunny_mem_vol=esunny_mem_vol.replace(to_replace=["GHFCMEDMA                ","GHFNewTT                 "],value="GHF")
+esunny_mem_vol=esunny_mem_vol.replace(to_replace=["PHSGSGXDMA               ","PHILLIPSG                "],value="PHILLIPSG")
+esunny_mem_vol=esunny_mem_vol.replace(to_replace=["Marex                    "],value="Marex")
+atp_mem_vol=atp_mem_vol.replace(to_replace="GHFNewTT",value="GHF")
+
+
+all_mem_vol=pd.concat([esunny_mem_vol,atp_mem_vol])
+
+
+print(all_mem_vol.groupby("Broker Short Name").sum())
+
+
+

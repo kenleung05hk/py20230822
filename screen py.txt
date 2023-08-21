@@ -1,0 +1,26 @@
+import pyautogui
+import datetime
+
+date = datetime.datetime.now().strftime("%Y%m%d%H%M")
+
+# Get the title of the Excel window
+excel_title = [title for title in pyautogui.getAllTitles() if 'Excel' in title][0]
+
+# Get the coordinates of the Excel window
+#excel_window = pyautogui.getWindowsWithTitle(excel_title)[0]
+#left, top, width, height = excel_window.left, excel_window.top, excel_window.width, excel_window.height
+
+# Capture the screenshot of the Excel window
+screenshot = pyautogui.screenshot()
+
+# Save the screenshot as a file
+path = f"Z:\\Dealing Room\\ken leung\\py data\\screeshot\\csop_{date}.png"
+screenshot.save(path)
+
+
+
+
+'''
+if __name__ == '__main__':
+    print_hi('PyCharm')
+'''

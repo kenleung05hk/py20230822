@@ -1,0 +1,67 @@
+import pathlib
+import pyexcel as pe
+import shutil
+from collections import OrderedDict
+
+YYYY="2022"
+MMMM="10"
+DDDD="01"
+newdirlist=[]
+reflist=[]
+newnamelist=[]
+oldpathlist=[]
+newpathlist=[]
+k=0
+y=0
+
+path = pathlib.Path('F:\\dayend.xlsx')                    #excel path
+path = str(path)
+
+mydict = pe.get_dict(file_name=path)                         #my dict
+
+for ref in mydict["ref_name"]:           #create ref list
+    reflist.append(ref)
+
+for oldname,olddir in zip(mydict["old_name"],mydict["old_dir"]):       #create oldpath list
+    oldpath=olddir+"\\"+oldname
+    oldpathlist.append(oldpath)
+
+for i in oldpathlist:                        #Check old path
+    i = pathlib.Path(i)
+    print(reflist[k]+"  "+str(i.exists()))
+    k = k+1
+
+for newdir in mydict["new_dir"]:           #create newdir list
+    newdir=newdir.replace("YYYY",YYYY)
+    newdir = newdir.replace("MMMM", MMMM)
+    newdirlist.append(newdir)
+
+
+for newname in mydict["new_name"]:           #create newname list
+    newname=newname.replace("YYYYMMMMDDDD",YYYY+MMMM+DDDD)
+    newnamelist.append(newname)
+
+
+for newdir, newname in zip(newdirlist,newnamelist):       #create newpath list
+    newpathlist.append(newdir+"\\"+newname)
+
+print(newpathlist)
+
+
+for i in newdirlist:                        #check dir
+    i = pathlib.Path(i)
+    print("dir:"+str(i.exists()))
+
+for i in newdirlist:       #touch dir
+    print(i)
+    i = pathlib.Path(i)
+    i.mkdir(parents=True, exist_ok=True)
+
+
+
+'''
+for op, np in zip(oldpathlist,newpathlist):     #old path to new path
+    my_file = pathlib.Path(op)                  #COPY TO DIR
+    to_file = pathlib.Path(np)
+    shutil.copy(str(my_file), str(to_file))      #Overwrite
+'''

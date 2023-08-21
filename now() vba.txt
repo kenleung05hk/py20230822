@@ -1,0 +1,11 @@
+Sub now()
+'
+' now
+'
+
+    ActiveCell.FormulaR1C1 = "=NOW()"
+    ActiveCell.Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+End Sub

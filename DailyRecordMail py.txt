@@ -1,0 +1,50 @@
+import win32com.client as win32
+from datetime import datetime, timedelta
+from pathlib import Path
+from pandas.tseries.offsets import BDay
+import glob
+import os
+import shutil
+
+timedata=datetime.now() - BDay(1)
+YYYY=timedata.strftime("%Y")
+MMMM=timedata.strftime("%m")
+DDDD=timedata.strftime("%d")
+YYYYMMMM=YYYY+'-'+MMMM
+numbertime=timedata.strftime('%Y%m%d')
+
+
+outlook = win32.Dispatch('outlook.application')
+mail = outlook.CreateItem(0)
+mail.Subject = 'Daily Record ' + numbertime
+mail.To = "wengyi@htfc.com"
+mail.CC = "dealing@htfc.com.hk"
+
+
+body_text = r"""
+ <font size="3">各位领导，</font>
+<br><br>
+您好！交易室每天追保记录如附件，供參阅。
+<br><br><br>
+"""
+
+mail.Display(False)
+mail.HTMLBody = body_text + mail.HTMLBody
+
+
+list_of_files = glob.glob('//10.109.255.11/home/Scan/*.pdf') # * means all if need specific format then *.csv
+latest_file = max(list_of_files, key=os.path.getctime)
+print(latest_file)
+
+
+to_file=Path("Z:\\Dealing Room\\ken leung\\py data\\py daily record\\"+numbertime+"dailyMCrecord.pdf")
+shutil.copy(str(latest_file), str(to_file))
+
+mail.Attachments.Add(str(to_file))
+os.startfile(str(to_file))
+
+print("scan file date:",str(latest_file[30:34]) ,str(latest_file[34:38])) #print scan date&time
+
+
+
+
